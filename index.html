@@ -1,11 +1,14 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
+
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>LA FAMILIA - Lector QR Inteligente</title>
 
-<script src="https://unpkg.com/html5-qrcode"></script>
+<!-- LIBRERÍA QR ESTABLE -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
 
 <style>
 
@@ -44,7 +47,13 @@ position:relative;
 font-size:46px;
 font-weight:bold;
 margin-bottom:10px;
-background:linear-gradient(90deg,#22c55e,#06b6d4,#3b82f6,#22c55e);
+background:linear-gradient(
+90deg,
+#22c55e,
+#06b6d4,
+#3b82f6,
+#22c55e
+);
 background-size:300%;
 -webkit-background-clip:text;
 -webkit-text-fill-color:transparent;
@@ -67,6 +76,7 @@ display:none;
 overflow:hidden;
 border-radius:20px;
 border:2px solid rgba(255,255,255,0.1);
+margin-top:15px;
 }
 
 .btn{
@@ -82,12 +92,20 @@ transition:0.3s;
 }
 
 .start-btn{
-background:linear-gradient(90deg,#22c55e,#16a34a);
+background:linear-gradient(
+90deg,
+#22c55e,
+#16a34a
+);
 color:white;
 }
 
 .stop-btn{
-background:linear-gradient(90deg,#ef4444,#dc2626);
+background:linear-gradient(
+90deg,
+#ef4444,
+#dc2626
+);
 color:white;
 display:none;
 }
@@ -196,7 +214,9 @@ opacity:0;
 
 <div class="container">
 
-<div class="title">LA FAMILIA</div>
+<div class="title">
+LA FAMILIA
+</div>
 
 <div class="subtitle">
 Sistema Inteligente de Rifas QR
@@ -213,10 +233,13 @@ Sistema Inteligente de Rifas QR
 <div id="reader"></div>
 
 <div class="loading" id="loading">
+
 <div class="spinner"></div>
+
 <div class="loading-text">
 Calculando resultado...
 </div>
+
 </div>
 
 <div class="footer">
@@ -227,10 +250,10 @@ Calculando resultado...
 
 <script>
 
-let scanner;
+let scanner = null;
 
 // ==========================
-// URL GANADORES
+// URL GANADOR
 // ==========================
 
 const redirectUrl =
@@ -247,51 +270,15 @@ const winnerKeywords = [
 "premio",
 "winner",
 "felicidades",
-"eres ganador",
 "has ganado",
-"jackpot",
 "victoria",
-"premio especial",
-"premio oro",
-"premio plata",
+"jackpot",
+"eres ganador",
 "premio vip",
-"codigo ganador",
-"ticket ganador",
-"boleto ganador",
-"lucky",
-"ganador oficial",
-"afortunado",
-"ganaste dinero",
-"premio grande",
-"premio final",
-"ganador 2026",
-"winner qr",
-"success",
-"reward",
-"congratulations",
-"gift winner",
-"gold winner",
-"super premio",
 "mega premio",
-"ganaste la rifa",
-"la familia ganador",
-"premio confirmado",
-"ganador absoluto",
-"ganador premium",
-"ganador secreto",
-"codigo lucky",
-"ticket lucky",
-"qr ganador",
-"victory",
-"first prize",
 "big winner",
-"ultimate winner",
-"prize unlocked",
-"winner unlocked",
-"claim prize",
 "you win",
-"winner code",
-"premio desbloqueado"
+"lucky"
 
 ];
 
@@ -303,50 +290,14 @@ const loserKeywords = [
 
 "perdedor",
 "perdiste",
-"no ganaste",
 "sin suerte",
 "lose",
 "loser",
-"intentalo otra vez",
-"prueba nuevamente",
-"ticket perdedor",
-"codigo perdedor",
-"fallaste",
-"derrota",
-"bad luck",
-"next time",
 "try again",
-"no tuviste suerte",
-"casi ganas",
-"no fue tu momento",
+"bad luck",
+"fallaste",
 "sin premio",
-"sin recompensa",
-"fallido",
-"ticket invalido",
-"failed",
-"better luck next time",
-"not winner",
-"not lucky",
-"prize denied",
-"sin victoria",
-"qr perdedor",
-"boleto perdedor",
-"premio no disponible",
-"no eres ganador",
-"not valid winner",
-"codigo sin premio",
-"game over",
-"unsuccessful",
-"sin exito",
-"no aprobado",
-"resultado negativo",
-"ticket no ganador",
-"you lose",
-"no reward",
-"not selected",
-"empty prize",
-"prueba la proxima",
-"no clasificado"
+"game over"
 
 ];
 
@@ -361,25 +312,38 @@ document.getElementById("stopBtn").style.display = "block";
 
 scanner = new Html5Qrcode("reader");
 
-Html5Qrcode.getCameras().then(devices=>{
-
-if(devices && devices.length){
-
 scanner.start(
-{ facingMode:"environment" },
+
+{
+facingMode: "environment"
+},
+
 {
 fps:10,
-qrbox:250
+qrbox:{
+width:250,
+height:250
 },
-onScanSuccess
-);
+aspectRatio:1
+},
 
+(decodedText)=>{
+
+onScanSuccess(decodedText);
+
+},
+
+(errorMessage)=>{
+
+// ignorar errores
 }
 
-}).catch(err=>{
+).catch(err=>{
+
+console.log(err);
 
 showNotification(
-"⚠ No se encontró cámara disponible",
+"⚠ Error al iniciar cámara",
 "invalid"
 );
 
@@ -400,6 +364,10 @@ scanner.stop().then(()=>{
 document.getElementById("reader").style.display = "none";
 document.getElementById("stopBtn").style.display = "none";
 
+}).catch(err=>{
+
+console.log(err);
+
 });
 
 }
@@ -412,7 +380,7 @@ document.getElementById("stopBtn").style.display = "none";
 
 function onScanSuccess(decodedText){
 
-navigator.vibrate(300);
+navigator.vibrate?.(300);
 
 stopScanner();
 
@@ -422,12 +390,14 @@ setTimeout(()=>{
 
 document.getElementById("loading").style.display="none";
 
-const code = decodedText.toLowerCase().trim();
+const code = decodedText
+.toLowerCase()
+.trim();
 
-console.log("Código leído:",code);
+console.log("Código leído:", code);
 
 // ==========================
-// DETECCIÓN GANADOR
+// DETECTAR GANADOR
 // ==========================
 
 const isWinner = winnerKeywords.some(
@@ -435,7 +405,7 @@ word => code.includes(word)
 );
 
 // ==========================
-// DETECCIÓN PERDEDOR
+// DETECTAR PERDEDOR
 // ==========================
 
 const isLoser = loserKeywords.some(
@@ -443,7 +413,7 @@ word => code.includes(word)
 );
 
 // ==========================
-// SI ES GANADOR
+// GANADOR
 // ==========================
 
 if(isWinner){
@@ -466,7 +436,7 @@ window.location.href = redirectUrl;
 }
 
 // ==========================
-// SI ES PERDEDOR
+// PERDEDOR
 // ==========================
 
 else if(isLoser){
@@ -474,7 +444,7 @@ else if(isLoser){
 playLoseSound();
 
 showNotification(
-"😢 No tuviste suerte esta vez.<br>Prueba nuevamente en la próxima ronda.",
+"😢 No tuviste suerte esta vez.<br>Prueba nuevamente.",
 "lose"
 );
 
@@ -487,13 +457,13 @@ startScanner();
 }
 
 // ==========================
-// CÓDIGO DESCONOCIDO
+// DESCONOCIDO
 // ==========================
 
 else{
 
 showNotification(
-"⚠ Código QR desconocido o no autorizado",
+"⚠ QR desconocido o no válido",
 "invalid"
 );
 
@@ -505,12 +475,12 @@ startScanner();
 
 }
 
-},5000);
+},3000);
 
 }
 
 // ==========================
-// NOTIFICACIONES
+// NOTIFICACIÓN
 // ==========================
 
 function showNotification(message,type){
@@ -598,4 +568,4 @@ confetti.remove();
 </script>
 
 </body>
-</html>
+  </html>
